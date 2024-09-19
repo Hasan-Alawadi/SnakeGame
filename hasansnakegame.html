@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasan's Snake Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #e0e0e0;
+            font-family: Arial, sans-serif;
+        }
+        #game-board {
+            position: relative;
+            width: 600px;
+            height: 600px;
+            background-color: #000;
+            border: 5px solid #333;
+            display: grid;
+            grid-template-columns: repeat(30, 1fr);
+            grid-template-rows: repeat(30, 1fr);
+        }
+        .snake {
+            background-color: lime;
+        }
+        .food {
+            background-color: red;
+        }
+        .obstacle {
+            background-color: orange;
+        }
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 24px;
+        }
+        #message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 32px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-board">
+        <h1 id="score">Score: 0</h1>
+        <div id="message">Press SPACE to start the game!</div>
+    </div>
+
+    <script>
+        const boardSize = 30;
+        const board = document.getElementById('game-board');
+        const scoreElement = document.getElementById('score');
+        const messageElement = document.getElementById('message');
+        const boardCells = [];
+        
+        let snake = [{ x: 15, y: 15 }];
+        let direction = { x: 0, y: 0 };
+        let food = { x: Math.floor(Math.random() * boardSize), y: Math.floor(Math.random() * boardSize) };
+        let score = 0;
+        let speed = 150;
+        let gameActive = false;
+
+        // Obstacles: Define the letters of "Hasan's Snake 🐍" as obstacles
+        const obstacles = [
+            { x: 5, y: 5 }, { x: 5, y: 6 }, { x: 5, y: 7 }, { x: 5, y: 8 }, { x: 5, y: 9 }, // 'H'
+            { x: 6, y: 7 }, { x: 7, y: 7 },                                                 // 'A'
+            { x: 8, y: 5 }, { x: 8, y: 6 }, { x: 8, y: 7 }, { x: 8, y: 8 }, { x: 8, y: 9 }, // 'S'
+            { x: 9, y: 7 }, { x: 9, y: 8 },                                                 // 'A'
+            { x: 10, y: 5 }, { x: 10, y: 6 }, { x: 10, y: 7 }, { x: 10, y: 8 },             // 'N'
+            { x: 12, y: 5 }, { x: 12, y: 6 }, { x: 12, y: 7 },                             // "'"
+            { x: 13, y: 5 }, { x: 13, y: 6 }, { x: 13, y: 7 }, { x: 13, y: 8 }, { x: 13, y: 9 }, // 'S'
+            { x: 15, y: 6 }, { x: 15, y: 7 },                                               // 'S'
+            { x: 16, y: 5 }, { x: 16, y: 6 }, { x: 16, y: 7 }, { x: 16, y: 8 },             // 'N'
+            { x: 17, y: 7 }, { x: 18, y: 7 },                                               // 'A'
+            { x: 19, y: 5 }, { x: 19, y: 6 }, { x: 19, y: 7 }, { x: 19, y: 8 }, { x: 19, y: 9 }, // 'K'
+            { x: 21, y: 7 }, { x: 21, y: 8 },                                               // 'E'
+            { x: 22, y: 6 }, { x: 22, y: 7 },                                               // 🐍 (emoji as obstacles)
+        ];
+
+        // Create the grid (board)
+        for (let i = 0; i < boardSize * boardSize; i++) {
+            const cell = document.createElement('div');
+            board.appendChild(cell);
+            boardCells.push(cell);
+        }
+
+        // Draw snake, food, and obstacles
+        function draw() {
+            boardCells.forEach(cell => cell.classList.remove('snake', 'food', 'obstacle'));
+
+            snake.forEach(segment => {
+                const index = segment.y * boardSize + segment.x;
+                boardCells[index].classList.add('snake');
+            });
+
+            const foodIndex = food.y * boardSize + food.x;
+            boardCells[foodIndex].classList.add('food');
+
+            obstacles.forEach(obstacle => {
+                const index = obstacle.y * boardSize + obstacle.x;
+                boardCells[index].classList.add('obstacle');
+            });
+        }
+
+        // Move snake
+        function move() {
+            const head = { x: snake[0].x + direction.x, y: snake[0].y + direction.y };
+
+            // Check for collision with walls, self, or obstacles
+            if (
+                head.x < 0 || head.x >= boardSize || 
+                head.y < 0 || head.y >= boardSize || 
+                snake.some(segment => segment.x === head.x && segment.y === head.y) || 
+                obstacles.some(obstacle => obstacle.x === head.x && obstacle.y === head.y)
+            ) {
+                return gameOver();
+            }
+
+            snake.unshift(head);
+            if (head.x === food.x && head.y === food.y) {
+                score++;
+                scoreElement.innerText = 'Score: ' + score;
+                food = { x: Math.floor(Math.random() * boardSize), y: Math.floor(Math.random() * boardSize) };
+            } else {
+                snake.pop();
+            }
+        }
+
+        // Game over
+        function gameOver() {
+            gameActive = false;
+            messageElement.innerText = 'Game Over! Press SPACE to restart';
+        }
+
+        // Change direction based on key press
+        function changeDirection(event) {
+            if (!gameActive && event.key === ' ') {
+                startGame();
+            }
+
+            if (gameActive) {
+                switch (event.key.toLowerCase()) {
+                    case 'w': if (direction.y === 0) direction = { x: 0, y: -1 }; break;
+                    case 's': if (direction.y === 0) direction = { x: 0, y: 1 }; break;
+                    case 'a': if (direction.x === 0) direction = { x: -1, y: 0 }; break;
+                    case 'd': if (direction.x === 0) direction = { x: 1, y: 0 }; break;
+                }
+            }
+        }
+
+        // Start game
+        function startGame() {
+            snake = [{ x: 15, y: 15 }];
+            direction = randomDirection();
+            score = 0;
+            scoreElement.innerText = 'Score: 0';
+            food = { x: Math.floor(Math.random() * boardSize), y: Math.floor(Math.random() * boardSize) };
+            gameActive = true;
+            messageElement.innerText = '';
+            gameLoop();
+        }
+
+        // Generate a random initial direction
+        function randomDirection() {
+            const directions = [{ x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: 1 }, { x: 0, y: -1 }];
+            return directions[Math.floor(Math.random() * directions.length)];
+        }
+
+        // Main game loop
+        function gameLoop() {
+            if (gameActive) {
+                move();
+                draw();
+                setTimeout(gameLoop, speed);
+            }
+        }
+
+        document.addEventListener('keydown', changeDirection);
+    </script>
+</body>
+</html>
