@@ -1,12 +1,7 @@
 #this my SnkeGame 
-# Have fun :)
-Here's a README template that you can use for Hasan's Snake Game. This template includes an overview, instructions for running the game, and details about the game's features:
-
----
-
 # Hasan's Snake Game
 
-A modern twist on the classic Snake Game, Hasan's Snake Game includes unique obstacles that form the name "Hasan's Snake 🐍" within the game grid. This project demonstrates JavaScript skills with a focus on DOM manipulation, event handling, and basic game development concepts.
+Snake Game includes unique obstacles that form the name "Hasan's Snake 🐍" within the game grid. This project demonstrates JavaScript skills with a focus on DOM manipulation, event handling, and basic game development concepts.
 
 ## Features
 
@@ -37,20 +32,3 @@ A modern twist on the classic Snake Game, Hasan's Snake Game includes unique obs
    cd hasan-snake-game
    ```
 3. **Open `index.html` in a Browser**: Simply double-click the `index.html` file or open it with a web browser.
-
-## Technologies Used
-
-- **HTML**: For structuring the game layout.
-- **CSS**: For styling the game board, snake, food, and obstacles.
-- **JavaScript**: For game logic, controls, score tracking, and rendering dynamic elements on the board.
-
-## Future Enhancements
-
-Some potential improvements for future versions:
-- Add multiple levels of difficulty.
-- Implement sound effects for scoring and game over.
-- Add a feature to save high scores.
-
----
-
-This README will give users a clear overview of your project and instructions to play, run, and understand the code behind the game!
